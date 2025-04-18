@@ -4,8 +4,6 @@
 -->
 
 <script>
-    // SSR(Server Side Rendering)を強制的にOFF
-    export const ssr = false;
     import CurrentLocationMap from "./CurrentLocationMap.svelte";
     import RouteMap from "./RouteMap.svelte";
 </script>
