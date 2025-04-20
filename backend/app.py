@@ -2,9 +2,11 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import math
 import requests
+import logging
 import time
 from dotenv import load_dotenv
 import os
+from services.route_service import generate_running_route
 
 app = Flask(__name__)
 CORS(app)
@@ -48,35 +50,94 @@ def get_ors_route(start, end):
         print(f"ORS Error: {response.status_code} - {response.text}")
         return None
 
+# @app.route("/api/route")
+# def route():
+#     # TODO: フロントエンドから送られた緯度経度を取得
+    
+#     # フロントエンドから送られた緯度経度を設定（ひとまず東京駅の緯度経度にしてます）
+#     center_lat = 35.681236
+#     center_lng = 139.767125
+    
+#     # 通過点となる地点の緯度経度を取得（ひとまず円形にしてます）
+#     points = generate_circle_points(center_lat, center_lng)
+
+#     # TODO: フロントエンドから送られた地点がスタート/ゴールになるように調整
+    
+#     # フロントエンドに返す経路一覧を格納するリスト
+#     features = []
+
+#     for i in range(len(points)):
+#         start = points[i]
+#         end = points[(i + 1) % len(points)]  # 隣り合う次の点（最後は始点に戻る）
+
+#         # OpenRouteService APIを呼び出して2点間の経路を取得
+#         route = get_ors_route(start, end)
+        
+#         if route:
+#             features.append(route["features"][0])
+#             time.sleep(2)  # APIの呼び出し制限に引っかからないように2秒程度待つ
+
+#     # 取得した経路をフロントエンドに返す
+#     return jsonify({
+#         "type": "FeatureCollection",
+#         "features": features
+#     })
+
 @app.route("/api/route")
 def route():
-    # TODO: フロントエンドから送られた緯度経度を取得
-    
-    # フロントエンドから送られた緯度経度を設定（ひとまず東京駅の緯度経度にしてます）
-    center_lat = 35.681236
-    center_lng = 139.767125
-    
-    # 通過点となる地点の緯度経度を取得（ひとまず円形にしてます）
-    points = generate_circle_points(center_lat, center_lng)
+    try:
+        # デバッグ: ルート作成関数のテスト開始ログ
+        app.logger.debug("Start generating route")
 
-    # TODO: フロントエンドから送られた地点がスタート/ゴールになるように調整
-    
-    # フロントエンドに返す経路一覧を格納するリスト
-    features = []
+        # フロントエンドから送られた緯度経度を設定（ひとまず東京駅の緯度経度にしてます）
+        current_lat = 35.681236
+        current_lon = 139.767125
 
-    for i in range(len(points)):
-        start = points[i]
-        end = points[(i + 1) % len(points)]  # 隣り合う次の点（最後は始点に戻る）
+        # 動物（例：ひよこ）の形を表す座標点
+        points = [
+            (2, 624),  # x1, y1 は現在地に対応
+            (889, 27),
+            (1559, 193),
+            (2751, 911),
+            (1684, 2728),
+            (806, 2506)
+        ]
 
-        # OpenRouteService APIを呼び出して2点間の経路を取得
-        route = get_ors_route(start, end)
-        
-        if route:
-            features.append(route["features"][0])
-            time.sleep(2)  # APIの呼び出し制限に引っかからないように2秒程度待つ
+        target_distance = 10.0  # 目標距離 10km
 
-    # 取得した経路をフロントエンドに返す
-    return jsonify({
-        "type": "FeatureCollection",
-        "features": features
-    })
+        # フロントエンドに返す経路一覧を格納するリスト
+        features = []
+
+        # ルート作成処理を呼び出す
+        app.logger.debug("Calling generate_running_route function")
+        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
+
+        # デバッグ: ルート作成結果を確認
+        app.logger.debug("Route generated: %s", route_data)
+
+        # 結果が期待通りでない場合、エラーログを追加
+        if not route_data:
+            app.logger.error("Failed to generate route. No route data returned.")
+            return jsonify({"error": "Failed to generate route"}), 500
+
+        # 成功した場合はフロントエンドに返す
+        features.append(route_data["route"]["features"][0])
+
+        # デバッグ: 返すデータを確認
+        app.logger.debug("Returning route data to frontend: %s", features)
+
+        return jsonify({
+            "type": "FeatureCollection",
+            "features": features
+        })
+
+    except Exception as e:
+        # 例外発生時のエラーログ
+        app.logger.error("Error in generating route: %s", str(e))
+        return jsonify({"error": "Internal Server Error"}), 500
+
+# ログの設定
+if __name__ == "__main__":
+    # ログレベル設定（DEBUGにして詳細なログを取得）
+    logging.basicConfig(level=logging.DEBUG)
+    app.run(debug=True)

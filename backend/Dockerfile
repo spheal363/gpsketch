@@ -1,7 +1,13 @@
-FROM python:3.13-alpine
+FROM python:3.11-slim
 
 # 作業ディレクトリを設定
 WORKDIR /backend
+
+# OpenCV の依存関係をインストール
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 # 必要な依存関係をインストール
 COPY requirements.txt ./
