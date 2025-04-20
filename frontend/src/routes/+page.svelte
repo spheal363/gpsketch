@@ -1,27 +1,25 @@
-<!--
-@component
-- SvelteKitのルートページ（http://localhost:5173/）
--->
-
 <script>
-    import CurrentLocationMap from "./CurrentLocationMap.svelte";
-    import RouteMap from "./RouteMap.svelte";
+  import FormScreen from "./form/FormScreen.svelte";
+  import RouteMap from "./RouteMap.svelte";
+
+  let screen = "home";
+  let animal = "";
+  let distance= "";
+
+  const nextScreen = () => {
+    screen = "mapScreen";
+  };
 </script>
 
-<!-- ナビゲーション -->
-<nav>
-    <a href="/">home</a>
-    <a href="/sample">sample</a>
-</nav>
+{#if screen === "home"}
+  <h1>お絵描きランニング</h1>
+  <button on:click={() => (screen = "formScreen")}>開始</button>
+{/if}
 
-<h1>Welcome to SvelteKit</h1>
-<p>
-    Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the
-    documentation
-</p>
+{#if screen === "formScreen"}
+  <FormScreen {animal} {distance} {nextScreen} />
+{/if}
 
-<!-- 現在位置を表示する地図コンポーネント -->
-<!-- <CurrentLocationMap /> -->
-
-<!-- バックエンドから受け取ったルートを表示する地図コンポーネント -->
-<RouteMap />
+{#if screen === "mapScreen"}
+  <RouteMap />
+{/if}
