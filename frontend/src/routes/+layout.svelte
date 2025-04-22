@@ -1,5 +1,6 @@
 <script>
   import { invalidate } from "$app/navigation";
+  import Navigation from "$lib/components/Navigation.svelte";
   import { onMount } from "svelte";
 
   // propsから`data`と`children`を取得
@@ -22,6 +23,8 @@
     return () => data.subscription.unsubscribe();
   });
 </script>
+
+<Navigation {session} />
 
 <!-- 子要素を描画 -->
 {@render children()}
