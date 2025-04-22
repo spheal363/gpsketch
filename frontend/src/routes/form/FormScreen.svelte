@@ -2,6 +2,7 @@
   export let animal: string;
   export let distance: string;
   export let nextScreen: () => void;
+  export let backToHome: () => void;
 </script>
 <form on:submit|preventDefault={nextScreen}>
   <select bind:value={animal} required>
@@ -14,3 +15,4 @@
   <input placeholder="走りたい距離" bind:value={distance} required />
   <button type="submit">生成</button>
 </form>
+<button on:click ={backToHome}>戻る</button>
