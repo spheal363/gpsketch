@@ -4,7 +4,7 @@
   import CollectionScreen from "./collection/CollectionScreen.svelte";
   let screen = "home";
   let animal = "";
-  let distance= "";
+  let distance = "";
 
   const nextScreen = () => {
     screen = "mapScreen";
@@ -12,7 +12,17 @@
   const backToHome = () => {
     screen = "home";
   };
+
+  let { data } = $props();
+  let { profiles } = $derived(data);
 </script>
+
+<h1>Welcome to Supabase!</h1>
+<ul>
+  {#each profiles as profile}
+    <li>{profile.name}</li>
+  {/each}
+</ul>
 
 {#if screen === "home"}
   <h1>お絵描きランニング</h1>
@@ -21,7 +31,7 @@
 {/if}
 
 {#if screen === "formScreen"}
-  <FormScreen {animal} {distance} {nextScreen} {backToHome}/>
+  <FormScreen {animal} {distance} {nextScreen} {backToHome} />
 {/if}
 
 {#if screen === "mapScreen"}
@@ -29,5 +39,5 @@
 {/if}
 
 {#if screen === "collectionScreen"}
-  <CollectionScreen {backToHome}/>
+  <CollectionScreen {backToHome} />
 {/if}
