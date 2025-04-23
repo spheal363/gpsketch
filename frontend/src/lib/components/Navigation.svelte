@@ -19,8 +19,8 @@
       <a href="/settings/profile">プロフィール</a>
       <button on:click={logout}>ログアウト</button>
     {:else}
-      <a href="/auth/login">Login</a>
-      <a href="/auth/signup">Sign up</a>
+      <a href="/auth/login">ログイン</a>
+      <a href="/auth/signup">サインアップ</a>
     {/if}
   </nav>
 </header>

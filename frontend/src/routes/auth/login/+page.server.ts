@@ -2,7 +2,7 @@ import { redirect, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import type { Actions } from "./$types";
 
-// 入力データのスキーマを定義
+// 入力データの検証ルールを定義
 const loginSchema = z.object({
   email: z.string().email("メールアドレスの形式ではありません。"),
   password: z.string().min(6, "6文字以上入力する必要があります。"),
