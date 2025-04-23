@@ -27,7 +27,7 @@
     gap: 2rem;
     min-height: 100vh;
     box-sizing: border-box;
-    background-color: #f9fafb;
+    background-color: #000D41;
   }
 
   .map-container {
@@ -61,12 +61,12 @@
   }
 
   .route-button {
-    background-color: #4CAF50;
+    background-color:  #FEA900;
     color: white;
   }
 
   .route-button:hover {
-    background-color: rgba(76, 175, 80, 0.7);
+    background-color: #d29418;
   }
 
   .back-button {

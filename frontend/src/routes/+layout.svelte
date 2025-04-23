@@ -4,7 +4,7 @@
   :global(body) {
     margin: 0;
     font-family: sans-serif;
-    background-color: #f8f9fa;
+    background-color: #000D41;
   }
 
   main {

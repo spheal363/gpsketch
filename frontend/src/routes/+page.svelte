@@ -16,6 +16,10 @@
   {#if screen === "home"}
     <Header />
 
+    <div class = "logo">
+      <img src="./DrawingRunning_logo.png" class="logo">
+    </div>
+
     <div class="button-container">
       <button class="action-button" on:click={() => screen = "formScreen"}>
         開始
@@ -40,12 +44,23 @@
 </main>
 
 <style>
-  main {
+  .main {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     padding: 1rem;
-    background-color: #f0f4f8;
+  }
+
+  .logo {
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+    height: 70vh;           
+  }
+
+  .logo img {
+    width: 600px;
+    height: auto;
   }
 
   .button-container {
@@ -64,19 +79,24 @@
     font-weight: bold;
     border: none;
     border-radius: 12px;
-    background-color: #4CAF50;
+    background-color: #FEA900;
     color: white;
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     transition: all 0.2s ease-in-out;
   }
 
   .action-button:hover {
-    background-color: #45a049;
+    background-color: #d29418;
     transform: translateY(-2px);
     cursor: pointer;
   }
 
   @media (max-width: 600px) {
+    .logo img {
+    width: 400px;
+    height: auto;
+  }
+
     .action-button {
       width: 80%;
       font-size: 1rem;

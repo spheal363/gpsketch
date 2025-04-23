@@ -8,7 +8,7 @@
 
 <header class="header">
     <div class="title text-3xl md:text-4xl lg:text-5xl flex justify-center items-center">
-        <h1>お絵かきランニング</h1>
+        <h1>おえかきランニング</h1>
     </div>
 
     <!-- ハンバーガーメニューのボタン -->
@@ -24,7 +24,7 @@
         left: 0;
         width: 100%;
         height: 80px;
-        background-color: #174a97;
+        background-color: #1342A4;
         color: #ffffff;
         display: flex;
         z-index: 1000;

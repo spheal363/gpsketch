@@ -39,6 +39,7 @@
           bind:value={distance}
           inputmode="decimal"
           pattern="^\d*\.?\d*$"
+          
           required
         />
         <button type="button" class="step-button" on:click={increment}>＋</button>
@@ -58,7 +59,7 @@
     align-items: center;
     padding: 2rem;
     min-height: 100vh;
-    background-color: #f9fafb;
+    background-color: #000D41;
   }
 
   .form {
@@ -82,9 +83,7 @@
     width: 100%;
   }
 
-  select:focus, input:focus {
-    border-color: #4CAF50;
-  }
+
 
   .distance-input label {
     margin-bottom: 0.25rem;
@@ -117,7 +116,7 @@
 
   button[type="submit"] {
     padding: 0.75rem;
-    background-color: #4CAF50;
+    background-color: #FEA900;
     color: white;
     font-weight: bold;
     border: none;
@@ -143,7 +142,7 @@
   }
 
   button[type="submit"]:hover {
-    background-color: rgba(71, 162, 74, 0.7); /* 緑色 + 透過 */
+    background-color: #d29418; /* 緑色 + 透過 */
   }
 
   .back-button:hover {
