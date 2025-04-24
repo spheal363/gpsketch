@@ -30,6 +30,7 @@
   }
 
   // 位置情報の取得に失敗したときの処理
+  function handleLocationError(event) {
     errorMessage = event.detail.message;
     // 位置情報が取得できない場合は東京駅を使用
     locationData = {
@@ -103,9 +104,9 @@
 
       if (!routeData.features || routeData.features.length === 0) {
         throw new Error("経路データが空です");
-      }
-      // バックエンドから経路を取得 const res = await fetch("http://localhost:5000/api/route"); const geo = await res.json();
-      
+      }      
+      console.log("経由地点",routeData.waypoints) //[{lat: 34.7280102, lng: 135.2339336, name: '水島銕也先生'},{lat: 34.7316463, lng: 135.2447187, name: '御影天神山１号線'}..]
+      console.log("総距離",routeData.total_distance)
 
       // 取得した経路を地図に描画
       routeLayer = L.geoJSON(routeData, {

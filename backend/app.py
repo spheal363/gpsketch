@@ -93,10 +93,13 @@ def generate_route():
 
             # 成功した場合はフロントエンドに返す
             features.append(route_data["route"]["features"][0])
+            print(features)
 
             return jsonify({
                 "type": "FeatureCollection",
-                "features": features
+                "features": features,
+                "waypoints":route_data["waypoints"],
+                "total_distance":route_data["total_distance"]
             })
 
     except Exception as e:
