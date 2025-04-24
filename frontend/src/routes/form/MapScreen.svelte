@@ -1,5 +1,7 @@
 <script lang="ts">
   import RouteMap from "../RouteMap.svelte";
+  export let animal: string;
+  export let distance: string;
   export let backToHome: () => void;
 
   const handleStart = () => {
@@ -9,7 +11,7 @@
 
 <div class="wrapper">
   <div class="map-container">
-    <RouteMap />
+    <RouteMap {animal}{distance}/>
   </div>
 
   <div class="button-group">
