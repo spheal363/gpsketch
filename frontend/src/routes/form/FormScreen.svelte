@@ -74,9 +74,12 @@
         </div>
       </div>
 
-      <button type="submit">ルート生成</button>
+      <div class="submit-button-wrapper">
+        <button type="submit">ルート生成</button>
+      </div>
     </form>
 
+    
     <button class="back-button" on:click={goBack}>戻る</button>
   </div>
 {/if}
@@ -86,9 +89,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 2.5rem;
     min-height: 100vh;
     background-color: #000d41;
+  }
+
+  h2 {
+    display: block;
+    font-size: 1.3em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
   }
 
   .form {
@@ -99,6 +113,7 @@
     max-width: 400px;
     background: white;
     padding: 2rem;
+    margin-top: 50%;
     border-radius: 1rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
@@ -142,6 +157,12 @@
     touch-action: manipulation;
   }
 
+  .submit-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
   button[type="submit"] {
     padding: 0.75rem;
     background-color: #fea900;
@@ -150,19 +171,19 @@
     border: none;
     border-radius: 8px;
     transition: background-color 0.2s;
-    width: 100%;
+    width: 60%;
   }
 
   .back-button {
     padding: 0.75rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     background-color: #777;
     color: white;
     font-weight: bold;
     border: none;
     border-radius: 8px;
     transition: background-color 0.2s;
-    width: 400px;
+    width: 60%;
   }
 
   .step-button:hover {

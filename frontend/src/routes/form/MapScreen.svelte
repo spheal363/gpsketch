@@ -51,7 +51,7 @@
 
   .route-button,
   .back-button {
-    width: 100%;
+    width: 60%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     font-weight: bold;
@@ -81,7 +81,7 @@
 
   @media (max-width: 600px) {
     .map-container {
-      height: 40vh;
+      height: 75vh;
     }
 
     .route-button,
