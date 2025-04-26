@@ -17,32 +17,73 @@
   export let detail: (run: Run) => void;
 </script>
 
+<header class="page-header">
+  <h1>ラン記録一覧（仮）</h1>
+</header>
+
+<div class="card-list">
+  {#each runs as run}
+    <div class="card" on:click={() => detail(run)}>
+      <div class="card-content">
+        <div><strong>描いた動物名:</strong> {run.animal_name}</div>
+        <div><strong>距離:</strong> {run.actual_distance_km} km</div>
+      </div>
+    </div>
+  {/each}
+</div>
+
 <div class="center-wrapper">
   <button class="back-button" on:click={goBack}>戻る</button>
 </div>
 
-<h2>ラン記録一覧（仮）</h2>
-
-<!-- 仮データを表示する部分 -->
-<ul>
-  {#each runs as run}
-    <li>
-      <button class="run-item" type="button" on:click={() => detail(run)}>
-        <strong>動物名:</strong>
-        {run.animal_name}
-        <strong>距離:</strong>
-        {run.actual_distance_km} km
-      </button>
-    </li>
-  {/each}
-</ul>
-
 <style>
+  .page-header {
+    background-color: #000825; 
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .page-header h1 {
+    margin: 0;
+    color: white;
+    font-size: 1.8rem;
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 300px; /* ← 横幅を固定（例えば300px） */
+    max-width: 90%; /* スマホ対応で縮む */
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-content {
+    color: #000d41;
+    font-size: 1rem;
+  }
+
   .center-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    margin-top: 2rem;
   }
 
   .back-button {
@@ -64,21 +105,5 @@
     .back-button {
       max-width: 100%;
     }
-  }
-  li {
-    color: white;
-  }
-  h2 {
-    color: white;
-  }
-  .run-item {
-    background: none;
-    border: none;
-    color: white;
-    text-align: left;
-    font-size: 1rem;
-    width: 100%;
-    cursor: pointer;
-    padding: 0.5rem;
   }
 </style>

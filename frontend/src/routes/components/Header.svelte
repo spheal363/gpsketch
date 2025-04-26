@@ -19,11 +19,11 @@
         left: 0;
         width: 100%;
         height: 80px;
-        background-color: #1342A4;
+        background-color: #000825;
         color: #ffffff;
         display: flex;
         z-index: 1000;
-        box-shadow: 0 4px 10px rgba(5, 81, 188, 0.661);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         justify-content: space-between;
         padding: 0 10px;
     }
