@@ -13,12 +13,12 @@
 
   let runs: Run[] = mockRuns;
 
-  export let backToHome: () => void;
-  export let detail: () => void;
+  export let goBack: () => void;
+  export let detail: (run: Run) => void;
 </script>
 
 <div class="center-wrapper">
-  <button class="back-button" on:click={backToHome}>戻る</button>
+  <button class="back-button" on:click={goBack}>戻る</button>
 </div>
 
 <h2>ラン記録一覧（仮）</h2>
@@ -27,18 +27,12 @@
 <ul>
   {#each runs as run}
     <li>
-      <strong>開始:</strong>
-      {run.start_time}、
-      <strong>終了:</strong>
-      {run.end_time}、
-      <strong>距離:</strong>
-      {run.actual_distance_km} km、
-      <strong>ペース:</strong>
-      {run.pace_min_per_km} min/km、
-      <strong>カロリー:</strong>
-      {run.calories} kcal、
-      <strong on:click = {detail}>動物名:</strong>
-      {run.animal_name}
+      <button class="run-item" type="button" on:click={() => detail(run)}>
+        <strong>動物名:</strong>
+        {run.animal_name}
+        <strong>距離:</strong>
+        {run.actual_distance_km} km
+      </button>
     </li>
   {/each}
 </ul>
@@ -71,10 +65,20 @@
       max-width: 100%;
     }
   }
-  li{
-    color:white;
+  li {
+    color: white;
   }
-  h2{
-    color:white;
+  h2 {
+    color: white;
+  }
+  .run-item {
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    padding: 0.5rem;
   }
 </style>
