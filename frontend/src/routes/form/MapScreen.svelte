@@ -2,7 +2,7 @@
   import RouteMap from "../RouteMap.svelte";
   export let animal: string;
   export let distance: string;
-  export let backToHome: () => void;
+  export let backToForm: () => void;
 
   const handleStart = () => {
     // ルートスタート処理
@@ -16,7 +16,7 @@
 
   <div class="button-group">
     <button class="route-button" on:click={handleStart}>このルートで走る</button>
-    <button class="back-button" on:click={backToHome}>戻る</button>
+    <button class="back-button" on:click={backToForm}>戻る</button>
   </div>
 </div>
 

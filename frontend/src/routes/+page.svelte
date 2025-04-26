@@ -13,7 +13,9 @@
     console.log("送信された距離:", distance);
     screen = "mapScreen";
   };
+
   const backToHome = () => screen = "home";
+  const backToForm = () => screen = "formScreen";
 </script>
 
 <main>
@@ -39,7 +41,7 @@
   {/if}
 
   {#if screen === "mapScreen"}
-    <MapScreen {animal}{distance}{backToHome}/>
+    <MapScreen {animal}{distance}{backToForm}/>
   {/if}
 
   {#if screen === "collectionScreen"}
