@@ -1,40 +1,25 @@
 <script lang="ts">
   import RouteMap from "../RouteMap.svelte";
-  import Loading from "../components/Loading.svelte";
   export let animal: string;
   export let distance: string;
   export let backToHome: () => void;
 
-  let loading = false;
-
-  const handleStart = async () => {
-    loading = true;
-
-    // 仮の処理（ここをAPI呼び出しやローカル処理に置き換えてOK）
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    loading = false;
+  const handleStart = () => {
+    // ルートスタート処理
   };
+  const numericDistance = Number(distance);
 </script>
 
-{#if loading}
-  <Loading />
-{:else}
-  <div class="wrapper">
-    <div class="map-container">
-      <RouteMap {animal} {distance} />
-    </div>
-
-    <div class="button-group">
-      <button class="route-button" on:click={handleStart}>
-        このルートで走る！
-      </button>
-      <button class="back-button" on:click={backToHome}>
-        戻る
-      </button>
-    </div>
+<div class="wrapper">
+  <div class="map-container">
+    <RouteMap {animal} distance={numericDistance} />
   </div>
-{/if}
+
+  <div class="button-group">
+    <button class="route-button" on:click={handleStart}>このルートで走る</button>
+    <button class="back-button" on:click={backToHome}>戻る</button>
+  </div>
+</div>
 
 <style>
   .wrapper {
@@ -51,7 +36,7 @@
   .map-container {
     width: 100%;
     max-width: 600px;
-    height: 75vh;
+    height: 75vh; 
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
@@ -79,7 +64,7 @@
   }
 
   .route-button {
-    background-color: #FEA900;
+    background-color:  #FEA900;
     color: white;
   }
 

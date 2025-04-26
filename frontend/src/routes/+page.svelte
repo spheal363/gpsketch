@@ -3,7 +3,7 @@
   import FormScreen from "./form/FormScreen.svelte";
   import MapScreen from "./form/MapScreen.svelte";
   import CollectionScreen from "./collection/CollectionScreen.svelte";
-
+  import DetailScreen from "./collection/DetailScreen.svelte";
   let screen = "home";
   let animal = "";
   let distance = "";
@@ -14,6 +14,7 @@
     screen = "mapScreen";
   };
   const backToHome = () => screen = "home";
+  const detail = () => screen = "detail"
 </script>
 
 <main>
@@ -43,7 +44,11 @@
   {/if}
 
   {#if screen === "collectionScreen"}
-    <CollectionScreen {backToHome} />
+    <CollectionScreen {backToHome} {detail}/>
+  {/if}
+
+  {#if screen === "detail"}
+    <DetailScreen {backToHome} />
   {/if}
 </main>
 
