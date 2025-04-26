@@ -86,7 +86,7 @@ def calculate_geo_coordinates(current_lat, current_lon, points, target_distance)
     # ステップ2: スケーリング係数hを計算
     total_distance_raw = sum(distances)
 
-    detour_factor=1.3 #デトア係数：直線距離に一定の係数を掛けることです。この係数は「迂回係数」または「デトア係数」と呼ばれます。
+    detour_factor=1.4 #デトア係数：直線距離に一定の係数を掛けることです。この係数は「迂回係数」または「デトア係数」と呼ばれます。
 
     h = target_distance /detour_factor / total_distance_raw
     
