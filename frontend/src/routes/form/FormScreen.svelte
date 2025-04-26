@@ -4,18 +4,9 @@
   export let nextScreen: () => void;
   export let goBack: () => void;
 
-  import Loading from '../components/Loading.svelte';
+  import Loading from "../components/Loading.svelte";
 
   let isLoading = false;
-
-  const handleSubmit = () => {
-    isLoading = true;
-
-    // DOMが更新されるのを待ってから次画面へ遷移（ローディングを表示させるため）
-    setTimeout(() => {
-      nextScreen();
-    }, 2000);
-  };
 
   const increment = () => {
     const current = parseFloat(distance) || 0;
@@ -48,7 +39,7 @@
   <Loading />
 {:else}
   <div class="form-wrapper">
-    <form class="form" on:submit|preventDefault={handleSubmit}>
+    <form class="form" on:submit|preventDefault={nextScreen}>
       <h2>描きたい動物と走る距離を入力</h2>
 
       <select bind:value={animal} required>
@@ -60,10 +51,13 @@
       </select>
 
       <div class="distance-input">
-        <label>距離（km）</label>
+        <label for="distance">距離（km）</label>
         <div class="distance-control">
-          <button type="button" class="step-button" on:click={decrement}>−</button>
+          <button type="button" class="step-button" on:click={decrement}
+            >−</button
+          >
           <input
+            id="distance"
             type="text"
             bind:value={distance}
             inputmode="decimal"
@@ -74,7 +68,9 @@
             autocorrect="off"
             autocapitalize="off"
           />
-          <button type="button" class="step-button" on:click={increment}>＋</button>
+          <button type="button" class="step-button" on:click={increment}
+            >＋</button
+          >
         </div>
       </div>
 

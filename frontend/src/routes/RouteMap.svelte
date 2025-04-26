@@ -8,6 +8,7 @@
   export const ssr = false;
   import { onMount } from "svelte";
   import LocationProvider from "./LocationProvider.svelte";
+  import Loading from "./components/Loading.svelte";
 
   // animalとdistanceのプロパティを受け取るように宣言
   export let animal = "hiyoko"; // デフォルト値を設定
@@ -184,6 +185,7 @@
 
   // ルート生成関数
   async function generateRoute() {
+    loading = true;
     if (!map || !locationData) {
       errorMessage = "地図が初期化されていないか、位置情報が取得できていません";
       loading = false;
@@ -312,7 +314,9 @@
   on:error={handleLocationError}
   autoGet={true}
 />
-
+{#if loading}
+  <Loading />
+{/if}
 <div id="map"></div>
 
 <style>
