@@ -2,11 +2,9 @@
   import RouteMap from "../RouteMap.svelte";
   export let animal: string;
   export let distance: string;
+  export let handleStart: () => void;
   export let goBack: () => void;
 
-  const handleStart = () => {
-    // ルートスタート処理
-  };
   const numericDistance = Number(distance);
 </script>
 
@@ -15,7 +13,7 @@
     <RouteMap {animal} distance={numericDistance} />
   </div>
 
-  <div class="button-group">
+  <div class="button-container">
     <button class="route-button" on:click={handleStart}>このルートで走る</button>
     <button class="back-button" on:click={goBack}>戻る</button>
   </div>
@@ -42,7 +40,7 @@
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   }
 
-  .button-group {
+  .button-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,7 +51,7 @@
 
   .route-button,
   .back-button {
-    width: 100%;
+    width: 60%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     font-weight: bold;
@@ -83,7 +81,7 @@
 
   @media (max-width: 600px) {
     .map-container {
-      height: 40vh;
+      height: 75vh;
     }
 
     .route-button,

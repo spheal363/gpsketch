@@ -21,6 +21,7 @@
 		"vite": "^6.2.5"
 	},
 	"dependencies": {
+		"canvas-confetti": "^1.9.3",
 		"leaflet": "^1.9.4"
 	}
 }

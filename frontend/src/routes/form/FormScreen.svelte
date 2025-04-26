@@ -4,18 +4,9 @@
   export let nextScreen: () => void;
   export let goBack: () => void;
 
-  import Loading from '../components/Loading.svelte';
+  import Loading from "../components/Loading.svelte";
 
   let isLoading = false;
-
-  const handleSubmit = () => {
-    isLoading = true;
-
-    // DOMが更新されるのを待ってから次画面へ遷移（ローディングを表示させるため）
-    setTimeout(() => {
-      nextScreen();
-    }, 2000);
-  };
 
   const increment = () => {
     const current = parseFloat(distance) || 0;
@@ -48,7 +39,7 @@
   <Loading />
 {:else}
   <div class="form-wrapper">
-    <form class="form" on:submit|preventDefault={handleSubmit}>
+    <form class="form" on:submit|preventDefault={nextScreen}>
       <h2>描きたい動物と走る距離を入力</h2>
 
       <select bind:value={animal} required>
@@ -60,10 +51,13 @@
       </select>
 
       <div class="distance-input">
-        <label>距離（km）</label>
+        <label for="distance">距離（km）</label>
         <div class="distance-control">
-          <button type="button" class="step-button" on:click={decrement}>−</button>
+          <button type="button" class="step-button" on:click={decrement}
+            >−</button
+          >
           <input
+            id="distance"
             type="text"
             bind:value={distance}
             inputmode="decimal"
@@ -74,13 +68,18 @@
             autocorrect="off"
             autocapitalize="off"
           />
-          <button type="button" class="step-button" on:click={increment}>＋</button>
+          <button type="button" class="step-button" on:click={increment}
+            >＋</button
+          >
         </div>
       </div>
 
-      <button type="submit">ルート生成</button>
+      <div class="submit-button-wrapper">
+        <button type="submit">ルート生成</button>
+      </div>
     </form>
 
+    
     <button class="back-button" on:click={goBack}>戻る</button>
   </div>
 {/if}
@@ -90,9 +89,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 2.5rem;
     min-height: 100vh;
     background-color: #000d41;
+  }
+
+  h2 {
+    display: block;
+    font-size: 1.3em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
   }
 
   .form {
@@ -103,6 +113,7 @@
     max-width: 400px;
     background: white;
     padding: 2rem;
+    margin-top: 50%;
     border-radius: 1rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
@@ -146,6 +157,12 @@
     touch-action: manipulation;
   }
 
+  .submit-button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
   button[type="submit"] {
     padding: 0.75rem;
     background-color: #fea900;
@@ -154,19 +171,19 @@
     border: none;
     border-radius: 8px;
     transition: background-color 0.2s;
-    width: 100%;
+    width: 60%;
   }
 
   .back-button {
     padding: 0.75rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     background-color: #777;
     color: white;
     font-weight: bold;
     border: none;
     border-radius: 8px;
     transition: background-color 0.2s;
-    width: 400px;
+    width: 60%;
   }
 
   .step-button:hover {

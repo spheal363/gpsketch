@@ -4,6 +4,7 @@
   import MapScreen from "./form/MapScreen.svelte";
   import CollectionScreen from "./collection/CollectionScreen.svelte";
   import DetailScreen from "./collection/DetailScreen.svelte";
+  import FinishRun from "./form/finishRun.svelte";
 
   let screen = "home";
   let animal = "";
@@ -37,10 +38,12 @@
     selectedRun = run; // 選択したランの情報をselectedRunに格納
     goToScreen("detail"); // 詳細画面に遷移
   };
+
   const goToScreen = (newScreen: string) => {
     screenHistory.push(screen);
     screen = newScreen;
   };
+
   const goBack = () => {
     const prev = screenHistory.pop();
     if (prev) {
@@ -49,6 +52,17 @@
       screen = "home"; // 戻る先がない場合はホームへ
     }
   };
+  const handleStart = () => {
+    screen = "finishRun"; //完走ページへ
+  };
+
+  const goHome = () => {
+    screen = "home";
+  };
+  
+  const goCollection = () => {
+    screen = "collectionScreen"
+  };
 </script>
 
 <main>
@@ -56,7 +70,11 @@
     <Header />
 
     <div class="logo">
-      <img src="./DrawingRunning_logo.png" class="logo" />
+      <img
+        src="./DrawingRunning_logo.png"
+        class="logo"
+        alt="DrawingRunningのロゴ"
+      />
     </div>
 
     <div class="button-container">
@@ -77,7 +95,7 @@
   {/if}
 
   {#if screen === "mapScreen"}
-    <MapScreen {animal} {distance} {goBack} />
+    <MapScreen {animal} {distance} {goBack} {handleStart} />
   {/if}
 
   {#if screen === "collectionScreen"}
@@ -87,16 +105,13 @@
   {#if screen === "detail"}
     <DetailScreen {goBack} run={selectedRun} />
   {/if}
+
+  {#if screen === "finishRun"}
+    <FinishRun {goHome} {goCollection} run={selectedRun} />
+  {/if}
 </main>
 
 <style>
-  .main {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 1rem;
-  }
-
   .logo {
     display: flex;
     justify-content: center;
