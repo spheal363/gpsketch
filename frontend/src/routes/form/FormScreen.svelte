@@ -4,7 +4,7 @@
   export let nextScreen: () => void;
   export let goBack: () => void;
 
-  import Loading from '../components/Loading.svelte';
+  import Loading from "../components/Loading.svelte";
 
   let isLoading = false;
 
@@ -60,10 +60,13 @@
       </select>
 
       <div class="distance-input">
-        <label>距離（km）</label>
+        <label for="distance">距離（km）</label>
         <div class="distance-control">
-          <button type="button" class="step-button" on:click={decrement}>−</button>
+          <button type="button" class="step-button" on:click={decrement}
+            >−</button
+          >
           <input
+            id="distance"
             type="text"
             bind:value={distance}
             inputmode="decimal"
@@ -74,7 +77,9 @@
             autocorrect="off"
             autocapitalize="off"
           />
-          <button type="button" class="step-button" on:click={increment}>＋</button>
+          <button type="button" class="step-button" on:click={increment}
+            >＋</button
+          >
         </div>
       </div>
 

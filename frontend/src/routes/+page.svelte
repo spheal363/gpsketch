@@ -56,7 +56,11 @@
     <Header />
 
     <div class="logo">
-      <img src="./DrawingRunning_logo.png" class="logo" />
+      <img
+        src="./DrawingRunning_logo.png"
+        class="logo"
+        alt="DrawingRunningのロゴ"
+      />
     </div>
 
     <div class="button-container">
@@ -90,13 +94,6 @@
 </main>
 
 <style>
-  .main {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 1rem;
-  }
-
   .logo {
     display: flex;
     justify-content: center;
