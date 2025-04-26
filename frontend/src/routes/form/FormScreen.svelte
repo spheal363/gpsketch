@@ -4,7 +4,19 @@
   export let nextScreen: () => void;
   export let backToHome: () => void;
 
-  /* 走る距離入力のカウントアップ・ダウン幅 */
+  import Loading from '../components/Loading.svelte';
+
+  let isLoading = false;
+
+  const handleSubmit = () => {
+    isLoading = true;
+
+    // DOMが更新されるのを待ってから次画面へ遷移（ローディングを表示させるため）
+    setTimeout(() => {
+      nextScreen();
+    }, 2000);
+  };
+
   const increment = () => {
     const current = parseFloat(distance) || 0;
     distance = String((current + 0.1).toFixed(1));
@@ -16,65 +28,62 @@
       distance = String((current - 0.1).toFixed(1));
     }
   };
-  // 入力が正しいかを検証する関数
+
   const handleInput = (e: Event) => {
-    const input = e.currentTarget as HTMLInputElement; // 型キャスト
+    const input = e.currentTarget as HTMLInputElement;
     let value = input.value;
 
-    // 半角数字と小数点以外を除外
-    value = value.replace(/[^0-9\.]/g, "");
-
-    // 小数点が複数回入力されないように制限
+    value = value.replace(/[^0-9.]/g, "");
     const dotCount = (value.match(/\./g) || []).length;
     if (dotCount > 1) {
-      // 小数点が複数回入力されていた場合は最後の小数点を削除
       value = value.slice(0, value.lastIndexOf("."));
     }
 
-    input.value = value; // 修正された入力値を設定
-    distance = value; 
+    input.value = value;
+    distance = value;
   };
 </script>
 
-<div class="form-wrapper">
-  <form class="form" on:submit|preventDefault={nextScreen}>
-    <h2>描きたい動物と走る距離を入力</h2>
+{#if isLoading}
+  <Loading />
+{:else}
+  <div class="form-wrapper">
+    <form class="form" on:submit|preventDefault={handleSubmit}>
+      <h2>描きたい動物と走る距離を入力</h2>
 
-    <select bind:value={animal} required>
-      <option value="" disabled selected>動物を選択</option>
-      <option value="hiyoko">ヒヨコ</option>
-      <option value="kuma">くま</option>
-      <option value="uma">馬</option>
-      <option value="yunicorn">ユニコーン</option>
-    </select>
+      <select bind:value={animal} required>
+        <option value="" disabled selected>動物を選択</option>
+        <option value="hiyoko">ヒヨコ</option>
+        <option value="kuma">くま</option>
+        <option value="uma">馬</option>
+        <option value="yunicorn">ユニコーン</option>
+      </select>
 
-    <div class="distance-input">
-      <label>距離（km）</label>
-      <div class="distance-control">
-        <button type="button" class="step-button" on:click={decrement}>−</button
-        >
-        <input
-          type="text"
-          bind:value={distance}
-          inputmode="decimal"
-          pattern="^\d*\.?\d*$"
-          required
-          on:input={(e) => handleInput(e)}
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-        />
-        <button type="button" class="step-button" on:click={increment}
-          >＋</button
-        >
+      <div class="distance-input">
+        <label>距離（km）</label>
+        <div class="distance-control">
+          <button type="button" class="step-button" on:click={decrement}>−</button>
+          <input
+            type="text"
+            bind:value={distance}
+            inputmode="decimal"
+            pattern="^\d*\.?\d*$"
+            required
+            on:input={handleInput}
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+          />
+          <button type="button" class="step-button" on:click={increment}>＋</button>
+        </div>
       </div>
-    </div>
 
-    <button type="submit">ルート生成</button>
-  </form>
+      <button type="submit">ルート生成</button>
+    </form>
 
-  <button class="back-button" on:click={backToHome}>戻る</button>
-</div>
+    <button class="back-button" on:click={backToHome}>戻る</button>
+  </div>
+{/if}
 
 <style>
   .form-wrapper {

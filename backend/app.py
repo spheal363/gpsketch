@@ -122,8 +122,14 @@ def get_runs():
         runs = Run.query.all()
         
         # データをシリアライズしてJSON形式で返す
-        runs_data = [
-            {
+        runs_data = []
+        for run in runs:
+            # route_idを使ってRouteテーブルからanimal_nameを取得
+            route = Route.query.get(run.route_id)
+            animal_name = route.animal_name if route else None
+            
+            # データを構築
+            runs_data.append({
                 "id": run.id,
                 "route_id": run.route_id,
                 "start_time": run.start_time,
@@ -132,9 +138,9 @@ def get_runs():
                 "pace_min_per_km": run.pace_min_per_km,
                 "calories": run.calories,
                 "track_geojson": run.track_geojson,
-            }
-            for run in runs
-        ]
+                "animal_name": animal_name
+            })
+            
         return jsonify(runs_data), 200
     except Exception as e:
         logging.error(f"Error fetching runs: {e}")
