@@ -2,7 +2,7 @@
   export let animal: string;
   export let distance: string;
   export let nextScreen: () => void;
-  export let backToHome: () => void;
+  export let goBack: () => void;
 
   import Loading from '../components/Loading.svelte';
 
@@ -81,7 +81,7 @@
       <button type="submit">ルート生成</button>
     </form>
 
-    <button class="back-button" on:click={backToHome}>戻る</button>
+    <button class="back-button" on:click={goBack}>戻る</button>
   </div>
 {/if}
 
