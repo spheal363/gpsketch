@@ -16,6 +16,24 @@
       distance = String((current - 0.1).toFixed(1));
     }
   };
+  // 入力が正しいかを検証する関数
+  const handleInput = (e: Event) => {
+    const input = e.currentTarget as HTMLInputElement; // 型キャスト
+    let value = input.value;
+
+    // 半角数字と小数点以外を除外
+    value = value.replace(/[^0-9\.]/g, "");
+
+    // 小数点が複数回入力されないように制限
+    const dotCount = (value.match(/\./g) || []).length;
+    if (dotCount > 1) {
+      // 小数点が複数回入力されていた場合は最後の小数点を削除
+      value = value.slice(0, value.lastIndexOf("."));
+    }
+
+    input.value = value; // 修正された入力値を設定
+    distance = value; 
+  };
 </script>
 
 <div class="form-wrapper">
@@ -33,16 +51,22 @@
     <div class="distance-input">
       <label>距離（km）</label>
       <div class="distance-control">
-        <button type="button" class="step-button" on:click={decrement}>−</button>
+        <button type="button" class="step-button" on:click={decrement}>−</button
+        >
         <input
           type="text"
           bind:value={distance}
           inputmode="decimal"
           pattern="^\d*\.?\d*$"
-          
           required
+          on:input={(e) => handleInput(e)}
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
         />
-        <button type="button" class="step-button" on:click={increment}>＋</button>
+        <button type="button" class="step-button" on:click={increment}
+          >＋</button
+        >
       </div>
     </div>
 
@@ -59,7 +83,7 @@
     align-items: center;
     padding: 2rem;
     min-height: 100vh;
-    background-color: #000D41;
+    background-color: #000d41;
   }
 
   .form {
@@ -71,10 +95,11 @@
     background: white;
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
 
-  select, input {
+  select,
+  input {
     padding: 0.75rem;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -82,8 +107,6 @@
     outline: none;
     width: 100%;
   }
-
-
 
   .distance-input label {
     margin-bottom: 0.25rem;
@@ -116,7 +139,7 @@
 
   button[type="submit"] {
     padding: 0.75rem;
-    background-color: #FEA900;
+    background-color: #fea900;
     color: white;
     font-weight: bold;
     border: none;
@@ -138,17 +161,17 @@
   }
 
   .step-button:hover {
-    background-color: rgba(192, 192, 192, 0.7); /* 明るいグレー + 透過 */
+    background-color: rgba(192, 192, 192, 0.7);
   }
 
   button[type="submit"]:hover {
-    background-color: #d29418; /* 緑色 + 透過 */
+    background-color: #d29418;
   }
 
   .back-button:hover {
-    background-color: rgba(119, 119, 119, 0.7); /* グレー + 透過 */
+    background-color: rgba(119, 119, 119, 0.7);
   }
-  
+
   @media (max-width: 600px) {
     .form {
       padding: 1.5rem;
