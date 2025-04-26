@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   frontend:
@@ -28,3 +28,25 @@ services:
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
+      - DATABASE_URL=mysql://root:password@mysql:3306/hackathon_db
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: touka_db
+      MYSQL_USER: touka
+      MYSQL_PASSWORD: touka
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/init.sql # init.sql をマウント
+      - ./seed.sql:/seed.sql # seed.sql をマウント
+
+volumes:
+  mysql_data:
