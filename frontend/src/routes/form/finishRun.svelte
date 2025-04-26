@@ -8,9 +8,8 @@
   
     onMount(() => {
       console.log("完走ページに到達！");
-      console.log("完走ページに到達！");
-      confetti({
-        particleCount: 150,
+      confetti({  //紙吹雪の表示
+        particleCount: 300,
         spread: 70,
         origin: { y: 0.6 }
       });

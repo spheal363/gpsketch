@@ -103,7 +103,7 @@
   {/if}
 
   {#if screen === "finishRun"}
-    <FinishRun {goHome} {goCollection} run={selectedRun} distance={Number(distance)} calories={300} /> <!-- 仮でカロリー300とする -->
+    <FinishRun {goHome} {goCollection} run={selectedRun} />
   {/if}
 </main>
 
