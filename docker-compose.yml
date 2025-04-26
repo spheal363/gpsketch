@@ -45,8 +45,8 @@ services:
       MYSQL_PASSWORD: touka
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/init.sql # init.sql をマウント
-      - ./seed.sql:/seed.sql # seed.sql をマウント
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # init.sql をマウント
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql # seed.sql をマウント
 
 volumes:
   mysql_data:
