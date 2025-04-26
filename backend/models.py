@@ -13,7 +13,8 @@ class Route(db.Model):
     actual_route_distance_km = db.Column(db.Float)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     route_geojson = db.Column(JSON)
-    stat_point = db.Column(db.Text)  # POINT型は一旦Textで管理するのが楽
+    stat_end_latitude = db.Column(db.Float)
+    stat_end_longitude = db.Column(db.Float)
     image_url = db.Column(db.Text)
     image_bounds = db.Column(JSON)
 
@@ -39,6 +40,7 @@ class TrackPoint(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     run_id = db.Column(db.String(36), db.ForeignKey('runs.id'), nullable=False)
     timestamp = db.Column(db.DateTime)
-    location = db.Column(db.Text)  # POINT型は一旦Textで管理
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
     distance_from_start = db.Column(db.Float)
     route_index = db.Column(db.Integer)

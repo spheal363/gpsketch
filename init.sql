@@ -10,7 +10,8 @@ CREATE TABLE routes (
   actual_route_distance_km FLOAT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   route_geojson JSON,
-  stat_point POINT,
+  stat_end_latitude FLOAT,
+  stat_end_longitude FLOAT,
   image_url TEXT,
   image_bounds JSON
 );
@@ -33,7 +34,8 @@ CREATE TABLE track_points (
   id CHAR(36) PRIMARY KEY,
   run_id CHAR(36) NOT NULL,
   timestamp TIMESTAMP,
-  location POINT,
+  latitude FLOAT,
+  longitude FLOAT,
   distance_from_start FLOAT,
   route_index INT,
   FOREIGN KEY (run_id) REFERENCES runs(id)
