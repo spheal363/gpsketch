@@ -102,7 +102,6 @@ def generate_route():
 
             # 成功した場合はフロントエンドに返す
             features.append(route_data["route"]["features"][0])
-            print(features)
 
             return jsonify({
                 "type": "FeatureCollection",
