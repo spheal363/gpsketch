@@ -7,14 +7,9 @@
 </script>
 
 <header class="header">
-    <div class="title text-3xl md:text-4xl lg:text-5xl flex justify-center items-center">
-        <h1>おえかきランニング</h1>
+    <div class="header-logo title text-3xl md:text-4xl lg:text-5xl flex justify-center items-center">
+        <img src="./DrawingRunning_logo_strings.png" class="logo">
     </div>
-
-    <!-- ハンバーガーメニューのボタン -->
-    <span class="menu-toggle text-6xl flex justify-center items-center relative bottom-1" on:click={toggleMenu} aria-label="Toggle navigation">
-        ☰
-    </span>
 </header>
 
 <style>
@@ -30,16 +25,18 @@
         z-index: 1000;
         box-shadow: 0 4px 10px rgba(5, 81, 188, 0.661);
         justify-content: space-between;
-        padding: 0 20px;
+        padding: 0 10px;
     }
 
-    /* ハンバーガーメニューのボタン */
-    .menu-toggle {
-        display: none; /* PCでは非表示 */
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
+    .header-logo {
+        display: flex;
+        align-items: center;                
+   }
+
+    .header-logo img {
+        margin-top: 3px;
+        width: 50%;
+        height: auto;
     }
 
     @media (max-width: 600px) {
