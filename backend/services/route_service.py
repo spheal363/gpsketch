@@ -333,6 +333,7 @@ def generate_running_route(current_lat, current_lon, points, target_distance, or
     # 実際のルート距離を計算
     actual_distance, route_data = get_route_distance(waypoints, ors_api_key)
     
+    waypoints.pop()#出発地と到着地は同じなので、到着地を除外
     # 結果を整形
     result = {
         "waypoints": waypoints,
@@ -340,7 +341,7 @@ def generate_running_route(current_lat, current_lon, points, target_distance, or
         "route": route_data
     }
     return result
-    # return json.dumps(result, indent=2, ensure_ascii=False) テスト用
+    # return json.dumps(result, indent=2, ensure_ascii=False) #テスト用
 
 
 # # テスト用のメイン実行部分（このファイルが直接実行された場合のみ実行）

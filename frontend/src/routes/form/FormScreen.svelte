@@ -24,10 +24,10 @@
 
     <select bind:value={animal} required>
       <option value="" disabled selected>動物を選択</option>
-      <option value="犬">犬</option>
-      <option value="猫">猫</option>
-      <option value="鳥">鳥</option>
-      <option value="ウサギ">ウサギ</option>
+      <option value="hiyoko">ヒヨコ</option>
+      <option value="kuma">くま</option>
+      <option value="uma">馬</option>
+      <option value="yunicorn">ユニコーン</option>
     </select>
 
     <div class="distance-input">

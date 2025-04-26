@@ -8,7 +8,11 @@
   let animal = "";
   let distance = "";
 
-  const nextScreen = () => screen = "mapScreen";
+  const nextScreen = () => {
+    console.log("送信された動物:", animal);
+    console.log("送信された距離:", distance);
+    screen = "mapScreen";
+  };
   const backToHome = () => screen = "home";
 </script>
 
@@ -31,11 +35,11 @@
   {/if}
 
   {#if screen === "formScreen"}
-    <FormScreen {animal} {distance} {nextScreen} {backToHome} />
+    <FormScreen bind:animal bind:distance {nextScreen} {backToHome} />
   {/if}
 
   {#if screen === "mapScreen"}
-    <MapScreen {backToHome}/>
+    <MapScreen {animal}{distance}{backToHome}/>
   {/if}
 
   {#if screen === "collectionScreen"}

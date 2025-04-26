@@ -7,48 +7,143 @@
 <script>
   export const ssr = false;
   import { onMount } from "svelte";
+  import LocationProvider from "./LocationProvider.svelte";
+
+  // animalとdistanceのプロパティを受け取るように宣言
+  export let animal = "hiyoko"; // デフォルト値を設定
+  export let distance = 10; // デフォルト値をkm単位で設定
 
   let map;
+  let routeLayer;
+  let loading = true;
+  let errorMessage = "";
+  let locationData = null;  // 位置情報を格納する変数を初期化
+  let L;
 
-  onMount(async () => {
-    // Leafletライブラリをインポート
-    const L = await import("leaflet");
-    await import("leaflet/dist/leaflet.css");
+  // 位置情報が更新されたときの処理
+  function handleLocationUpdate(event) {
+    locationData = event.detail;
+    if (locationData && L) {
+      initializeMap(locationData.latitude, locationData.longitude);
+      generateRoute();
+    }
+  }
 
-    // サンプルとして東京駅の緯度経度をバックエンドに渡す
-    const tokyoStation = [35.681236, 139.767125];
-    // 地図を初期化
-    map = L.map("map").setView(tokyoStation, 15);
+  // 位置情報の取得に失敗したときの処理
+  function handleLocationError(event) {
+    errorMessage = event.detail.message;
+    // 位置情報が取得できない場合は東京駅を使用
+    locationData = {
+      latitude: 35.681236,
+      longitude: 139.767125
+    };
+    
+    if (L) {
+      initializeMap(locationData.latitude, locationData.longitude);
+      generateRoute();
+    }
+  }
 
-    // OpenStreetMapのタイルレイヤー（地図の右下に書いてあるやつ）を追加
+  // 地図初期化関数
+  function initializeMap(lat, lng) {
+    if (map) return; // 既に初期化されている場合は何もしない
+    
+    map = L.map("map").setView([lat, lng], 15);
+
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
     }).addTo(map);
 
-    // 東京駅にマーカーを追加
-    L.marker(tokyoStation).addTo(map).bindPopup("東京駅（中心）").openPopup();
+    // 現在位置にマーカーを追加
+    L.marker([lat, lng]).addTo(map).bindPopup("現在位置").openPopup();
+  }
+
+  // ルート生成関数
+  async function generateRoute() {
+    if (!map || !locationData) {
+      errorMessage = "地図が初期化されていないか、位置情報が取得できていません";
+      loading = false;
+      return;
+    }
 
     try {
-      // TODO: ユーザが入力した値（形、距離）をバックエンドに渡す
+      // animalとdistanceをログに出力
+      console.log(`形状: ${animal}、距離: ${distance}km`);
+      console.log(`緯度: ${locationData.latitude}、経度: ${locationData.longitude}`);
+      // 既存のルートレイヤーがあれば削除
+      if (routeLayer) {
+        map.removeLayer(routeLayer);
+      }
 
-      // バックエンドから経路を取得
-      const res = await fetch("http://localhost:5000/api/route");
-      const geo = await res.json();
+      // バックエンドに送信するデータ
+      const requestData = {
+        shape: animal,
+        length: parseFloat(distance) || 10.0, // 数値に変換、変換できない場合はデフォルト値
+        latitude: locationData.latitude,
+        longitude: locationData.longitude
+      };
+
+      console.log("APIリクエスト送信:", requestData);
+
+      // バックエンドAPIを呼び出し
+      const response = await fetch("http://localhost:5000/api/route/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "経路生成に失敗しました");
+      }
+
+      const routeData = await response.json();
+      console.log("APIレスポンス:", routeData);
+
+      if (!routeData.features || routeData.features.length === 0) {
+        throw new Error("経路データが空です");
+      }      
+      console.log("経由地点",routeData.waypoints) //[{lat: 34.7280102, lng: 135.2339336, name: '水島銕也先生'},{lat: 34.7316463, lng: 135.2447187, name: '御影天神山１号線'}..]
+      console.log("総距離",routeData.total_distance)
 
       // 取得した経路を地図に描画
-      const layer = L.geoJSON(geo, {
+      routeLayer = L.geoJSON(routeData, {
         style: {
           color: "red",
           weight: 8,
           opacity: 0.7,
         },
       }).addTo(map);
-      map.fitBounds(layer.getBounds());
+      map.fitBounds(routeLayer.getBounds());
     } catch (err) {
       console.error("経路情報の取得に失敗しました", err);
+      errorMessage = "経路の取得に失敗しました。ネットワーク接続を確認してください。";
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(async () => {
+    // Leafletライブラリをインポート
+    L = await import("leaflet");
+    await import("leaflet/dist/leaflet.css");
+
+    // もし位置情報がすでにあれば地図を初期化
+    if (locationData) {
+      initializeMap(locationData.latitude, locationData.longitude);
+      generateRoute();
     }
   });
 </script>
+
+<!-- LocationProviderコンポーネントを使用して位置情報を取得 -->
+<LocationProvider 
+  on:locationUpdate={handleLocationUpdate}
+  on:error={handleLocationError}
+  autoGet={true}
+/>
 
 <div id="map"></div>
 
