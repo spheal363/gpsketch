@@ -90,18 +90,34 @@ def generate_route():
         else:
             points = SHAPES[shape]
         
-    # フロントエンドに返す経路一覧を格納するリスト
+        # フロントエンドに返す経路一覧を格納するリスト
         features = []
 
+        # ルート作成処理を呼び出す
+        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
         # ルート作成処理を呼び出す
         route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
 
         # 結果が期待通りでない場合、エラーログを追加
         if not route_data:
             return jsonify({"error": "Failed to generate route"}), 500
+        # 結果が期待通りでない場合、エラーログを追加
+        if not route_data:
+            return jsonify({"error": "Failed to generate route"}), 500
 
         # 成功した場合はフロントエンドに返す
         features.append(route_data["route"]["features"][0])
+        print(features)
+        
+        # routesに保存
+        route = Route(
+            id=str(uuid.uuid4()),
+            animal_name=shape,
+            distance_km=target_distance,
+            route_geojson=features[0],
+            stat_end_latitude=current_lat,
+            stat_end_longitude=current_lon
+        )
 
         return jsonify({
             "type": "FeatureCollection",
@@ -112,7 +128,121 @@ def generate_route():
 
     except Exception as e:
         # 例外発生時のエラーログ
-        return jsonify({"error": "Internal Server Error"}), 500
+        return jsonify({"error": e}), 500
+
+@app.route('/api/run/start', methods=['POST'])
+def start_run():
+    try:
+        data = request.json
+        route_id = data['route_id']
+
+        new_run = Run(
+            id=str(uuid.uuid4()),
+            route_id=route_id,
+            start_time=datetime.utcnow()
+        )
+        db.session.add(new_run)
+        db.session.commit()
+
+        return jsonify({"run_id": new_run.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Failed to start run: {e}")
+        return jsonify({"error": "Failed to start run"}), 500
+
+@app.route('/api/run/track', methods=['POST'])
+def track_run():
+    try:
+        data = request.json
+        run_id = data['run_id']
+        latitude = data['latitude']
+        longitude = data['longitude']
+        timestamp = data.get('timestamp', datetime.utcnow())
+
+        new_track_point = TrackPoint(
+            id=str(uuid.uuid4()),
+            run_id=run_id,
+            timestamp=timestamp,
+            latitude=latitude,
+            longitude=longitude
+        )
+
+        db.session.add(new_track_point)
+        db.session.commit()
+
+        return jsonify({"status": "ok"}), 201
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Failed to track point: {e}")
+        return jsonify({"error": "Failed to track point"}), 500
+
+def haversine(lat1, lon1, lat2, lon2):
+    # 2点間の距離を計算する（ハーヴァサイン公式）
+    R = 6371  # 地球半径 (km)
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+
+    return R * c
+
+@app.route('/api/run/finish', methods=['POST'])
+def finish_run():
+    try:
+        data = request.json
+        run_id = data['run_id']
+
+        run = Run.query.get(run_id)
+        if not run:
+            return jsonify({"error": "Run not found"}), 404
+
+        # TrackPoint取得
+        track_points = TrackPoint.query.filter_by(run_id=run_id).order_by(TrackPoint.timestamp).all()
+
+        if len(track_points) < 2:
+            return jsonify({"error": "Not enough track points"}), 400
+
+        # 総移動距離を計算
+        total_distance_km = 0.0
+        for i in range(1, len(track_points)):
+            prev = track_points[i-1]
+            curr = track_points[i]
+            distance = haversine(prev.latitude, prev.longitude, curr.latitude, curr.longitude)
+            total_distance_km += distance
+
+        # 開始/終了時刻
+        start_time = track_points[0].timestamp
+        end_time = track_points[-1].timestamp
+
+        # 総時間（分）
+        total_minutes = (end_time - start_time).total_seconds() / 60.0
+
+        # ペース（分/km）
+        pace_min_per_km = total_minutes / total_distance_km if total_distance_km > 0 else None
+
+        # 簡易カロリー計算（仮：体重60kgとして 1kmあたり60kcal）
+        calories = int(total_distance_km * 60)
+
+        # Run更新
+        run.end_time = end_time
+        run.actual_distance_km = total_distance_km
+        run.pace_min_per_km = pace_min_per_km
+        run.calories = calories
+
+        db.session.commit()
+
+        return jsonify({
+            "status": "finished",
+            "total_distance_km": total_distance_km,
+            "pace_min_per_km": pace_min_per_km,
+            "calories": calories
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Failed to finish run: {e}")
+        return jsonify({"error": "Failed to finish run"}), 500
 
 @app.route("/api/runs", methods=["GET"])
 def get_runs():
@@ -145,6 +275,30 @@ def get_runs():
         logging.error(f"Error fetching runs: {e}")
         return jsonify({"error": "Failed to fetch runs"}), 500
 
+@app.route("/api/route/753ca900-227d-11f0-8765-0242ac1a0003", methods=["GET"])
+def get_route(route_id):
+    try:
+        # 指定されたroute_idに対応するRouteを取得
+        route = Route.query.get(route_id)
+        if not route:
+            return jsonify({"error": "Route not found"}), 404
+
+        # RouteデータをJSON形式で返す
+        route_data = {
+            "id": route.id,
+            "animal_name": route.animal_name,
+            "distance_km": route.distance_km,
+            "actual_route_distance_km": route.actual_route_distance_km,
+            "route_geojson": route.route_geojson,
+            "stat_end_latitude": route.stat_end_latitude,
+            "stat_end_longitude": route.stat_end_longitude,
+            "image_url": route.image_url,
+            "image_bounds": route.image_bounds
+        }
+        return jsonify(route_data), 200
+    except Exception as e:
+        logging.error(f"Error fetching route {route_id}: {e}")
+        return jsonify({"error": "Failed to fetch route"}), 500
 
 # ログの設定
 if __name__ == "__main__":
