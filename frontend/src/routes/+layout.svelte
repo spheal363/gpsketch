@@ -2,6 +2,7 @@
   import { invalidate } from "$app/navigation";
   import Navigation from "$lib/components/Navigation.svelte";
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
 
   // propsから`data`と`children`を取得
   let { data, children } = $props();
@@ -11,6 +12,12 @@
 
   // コンポーネントがマウントされた時に処理を実行
   onMount(() => {
+    // セッションが存在しない場合、ログインページにリダイレクト
+    if (!session) {
+      goto("/auth/login");
+      return;
+    }
+
     // 認証状態が変化したときのリスナーを登録
     const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
       // セッションの有効期限が変わった場合、SvelteKitにキャッシュの無効化を通知

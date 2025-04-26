@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { z } from "zod";
-import type { Actions, PageServerLoad } from "./$types";
+import type { Actions } from "./$types";
 
 // 入力データの検証ルールを定義
 const loginSchema = z.object({
@@ -9,20 +9,8 @@ const loginSchema = z.object({
   password: z.string().min(6, "6文字以上入力する必要があります。"),
 });
 
-export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  // セッションの取得
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  // 認証済みの場合、リダイレクト
-  if (session) {
-    throw redirect(303, "/");
-  }
-};
-
 export const actions: Actions = {
-  default: async ({ request, locals: { supabase } }) => {
+  default: async ({ request, locals }) => {
     const formData = await request.formData();
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;

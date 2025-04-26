@@ -9,7 +9,10 @@ const loginSchema = z.object({
 });
 
 export const actions: Actions = {
-  default: async ({ request, locals: { supabase } }) => {
+  default: async ({ request, locals }) => {
+    // セッション情報を取得
+    const { session } = await locals.supabase.auth.safeGetSession();
+
     const formData = Object.fromEntries(await request.formData());
 
     // 入力データを検証
@@ -22,7 +25,7 @@ export const actions: Actions = {
     const { email, password } = result.data;
 
     // Supabaseでログイン処理
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await locals.supabase.auth.signInWithPassword({
       email,
       password,
     });

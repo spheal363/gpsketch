@@ -19,13 +19,6 @@
 
   let { data } = $props();
   let { session } = $derived(data);
-
-  // セッション情報をチェックしてリダイレクト
-  onMount(() => {
-    if (!session) {
-      goto("/auth/login");
-    }
-  });
 </script>
 
 {#if session}

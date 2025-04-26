@@ -1,5 +1,7 @@
 <script>
   import Loading from "$lib/components/Loading.svelte";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
 
   let isLoading = false; // サインアップ処理中かどうかを管理するフラグ
 
@@ -7,6 +9,16 @@
   let name = "";
   let email = "";
   let password = "";
+
+  // セッション情報を取得してリダイレクト
+  let { data } = $props();
+  let { session } = $derived(data);
+
+  onMount(() => {
+    if (session) {
+      goto("/"); // セッションが存在する場合、ルートページにリダイレクト
+    }
+  });
 </script>
 
 <form method="POST" on:submit={() => (isLoading = true)}>
