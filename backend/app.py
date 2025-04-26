@@ -8,8 +8,17 @@ from dotenv import load_dotenv
 import os
 from services.route_service import generate_running_route
 
+from config import Config
+from models import db, Route, Run, TrackPoint
+
 app = Flask(__name__)
 CORS(app)
+
+# 設定をアプリケーションに適用
+app.config.from_object(Config)
+
+# データベース初期化
+db.init_app(app)
 
 # 一つ上のディレクトリにある .env を読み込む
 load_dotenv()
@@ -105,6 +114,31 @@ def generate_route():
     except Exception as e:
         # 例外発生時のエラーログ
         return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route("/api/runs", methods=["GET"])
+def get_runs():
+    try:
+        # `runs` テーブルの全データを取得
+        runs = Run.query.all()
+        
+        # データをシリアライズしてJSON形式で返す
+        runs_data = [
+            {
+                "id": run.id,
+                "route_id": run.route_id,
+                "start_time": run.start_time,
+                "end_time": run.end_time,
+                "actual_distance_km": run.actual_distance_km,
+                "pace_min_per_km": run.pace_min_per_km,
+                "calories": run.calories,
+                "track_geojson": run.track_geojson,
+            }
+            for run in runs
+        ]
+        return jsonify(runs_data), 200
+    except Exception as e:
+        logging.error(f"Error fetching runs: {e}")
+        return jsonify({"error": "Failed to fetch runs"}), 500
 
 
 # ログの設定
