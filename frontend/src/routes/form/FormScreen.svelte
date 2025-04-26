@@ -8,15 +8,6 @@
 
   let isLoading = false;
 
-  const handleSubmit = () => {
-    isLoading = true;
-
-    // DOMが更新されるのを待ってから次画面へ遷移（ローディングを表示させるため）
-    setTimeout(() => {
-      nextScreen();
-    }, 2000);
-  };
-
   const increment = () => {
     const current = parseFloat(distance) || 0;
     distance = String((current + 0.1).toFixed(1));
@@ -48,7 +39,7 @@
   <Loading />
 {:else}
   <div class="form-wrapper">
-    <form class="form" on:submit|preventDefault={handleSubmit}>
+    <form class="form" on:submit|preventDefault={nextScreen}>
       <h2>描きたい動物と走る距離を入力</h2>
 
       <select bind:value={animal} required>
