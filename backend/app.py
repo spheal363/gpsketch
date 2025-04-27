@@ -1,15 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import math
-import requests
 import logging
-import time
 from dotenv import load_dotenv
 import os
 from services.route_service import generate_running_route
 
 from config import Config
 from models import db, Route, Run, TrackPoint
+import uuid
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -90,20 +89,39 @@ def generate_route():
         else:
             points = SHAPES[shape]
         
-    # フロントエンドに返す経路一覧を格納するリスト
+        # フロントエンドに返す経路一覧を格納するリスト
         features = []
 
         # ルート作成処理を呼び出す
         route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
-
+        
         # 結果が期待通りでない場合、エラーログを追加
         if not route_data:
             return jsonify({"error": "Failed to generate route"}), 500
 
         # 成功した場合はフロントエンドに返す
         features.append(route_data["route"]["features"][0])
+        
+        route_id = str(uuid.uuid4())
+        route = Route(
+            id=route_id,
+            animal_name=shape,
+            distance_km=target_distance,
+            actual_route_distance_km=route_data["total_distance"],
+            route_geojson=json.dumps({
+                "type": "FeatureCollection",
+                "features": route_data["route"]["features"][0],
+                "waypoints": route_data["waypoints"],
+                "total_distance": route_data["total_distance"]
+            }),
+            stat_end_latitude=current_lat,
+            stat_end_longitude=current_lon
+        )
+        db.session.add(route)
+        db.session.commit()
 
         return jsonify({
+            "route_id": route_id,
             "type": "FeatureCollection",
             "features": features,
             "waypoints":route_data["waypoints"],
@@ -112,7 +130,89 @@ def generate_route():
 
     except Exception as e:
         # 例外発生時のエラーログ
-        return jsonify({"error": "Internal Server Error"}), 500
+        return jsonify({"error": str(e)}), 500
+
+# ルート取得
+@app.route("/api/route/<route_id>", methods=["GET"])
+def get_route_by_id(route_id):
+    try:
+        route = Route.query.get(route_id)
+        if not route:
+            return jsonify({"error": "Route not found"}), 404
+
+        # route_geojsonをロードしてチェック
+        route_geojson = route.route_geojson
+        if isinstance(route_geojson, str):
+            import json
+            route_geojson = json.loads(route_geojson)
+
+        # featuresがリストでなければリスト化する
+        if isinstance(route_geojson.get("features"), dict):
+            route_geojson["features"] = [route_geojson["features"]]
+
+        route_data = {
+            "id": route.id,
+            "animal_name": route.animal_name,
+            "distance_km": route.distance_km,
+            "actual_route_distance_km": route.actual_route_distance_km,
+            "route_geojson": json.dumps(route_geojson),  # ここでまた文字列に戻して渡す
+            "stat_end_latitude": route.stat_end_latitude,
+            "stat_end_longitude": route.stat_end_longitude,
+            "image_url": route.image_url,
+            "image_bounds": route.image_bounds
+        }
+        return jsonify(route_data)
+
+    except Exception as e:
+        logging.error(f"Error fetching route: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/route/complete", methods=["POST"])
+def complete_route():
+    try:
+        data = request.get_json()
+
+        route_id = data.get("route_id")
+        start_time_str = data.get("start_time")
+        geojson = data.get("geojson")
+
+        if not route_id or not start_time_str or not geojson:
+            return jsonify({"error": "必要なデータが足りません。"}), 400
+
+        # start_timeをdatetime型に変換
+        start_time = datetime.fromisoformat(start_time_str)
+
+        # 現在時刻をend_timeに設定
+        end_time = datetime.now()
+
+        # 実際の距離（km）をgeojsonから取得する（total_distanceフィールド想定）
+        actual_distance_km = geojson.get("total_distance", 0.0)
+
+        # 仮にペース・カロリーを適当に設定する（あとでちゃんと計算してもOK）
+        # 例：5分/km固定、カロリー=距離(㎞)×60kcalくらい
+        pace_min_per_km = 5.0
+        calories = int(actual_distance_km * 60)
+
+        new_run = Run(
+            route_id=route_id,
+            start_time=start_time,
+            end_time=end_time,
+            actual_distance_km=actual_distance_km,
+            pace_min_per_km=pace_min_per_km,
+            calories=calories,
+            track_geojson=geojson
+        )
+
+        db.session.add(new_run)
+        db.session.commit()
+
+        return jsonify({"message": "Runデータ登録成功！", "run_id": new_run.id}), 201
+
+    except Exception as e:
+        logging.error(f"Error in complete_route: {e}")
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/api/runs", methods=["GET"])
 def get_runs():

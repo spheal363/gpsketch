@@ -6,6 +6,7 @@
 
 <script>
   let totalDistance = 0;
+  let routeId = "";
   export const ssr = false;
   import { onMount, createEventDispatcher } from "svelte";
   import LocationProvider from "./LocationProvider.svelte";
@@ -38,7 +39,7 @@
   // 位置情報の取得に失敗したときの処理
   function handleLocationError(event) {
     errorMessage = event.detail.message;
-    dispatch('error', { message: errorMessage }); // 親に通知
+    dispatch("error", { message: errorMessage }); // 親に通知
     locationData = {
       latitude: 35.681236,
       longitude: 139.767125,
@@ -180,8 +181,8 @@
     // paddingを0にしてぴったり収まるようにする
     map.fitBounds(bounds, {
       padding: [20, 20], // 少しだけ余白を追加
-      maxZoom: 14,       // 最大ズームレベルを制限
-      animate: true      // アニメーションを有効化
+      maxZoom: 14, // 最大ズームレベルを制限
+      animate: true, // アニメーションを有効化
     });
 
     console.log("マップの表示範囲を調整しました");
@@ -192,7 +193,7 @@
     loading = true;
     if (!map || !locationData) {
       errorMessage = "地図が初期化されていないか、位置情報が取得できていません";
-      dispatch('error', { message: errorMessage });
+      dispatch("error", { message: errorMessage });
       loading = false;
       return;
     }
@@ -201,7 +202,7 @@
       console.log(`形状: ${animal}、距離: ${distance}km`);
 
       console.log(
-        `緯度: ${locationData.latitude}、経度: ${locationData.longitude}`,
+        `緯度: ${locationData.latitude}、経度: ${locationData.longitude}`
       );
       // 既存のルートレイヤーがあれば削除
       if (routeLayer) {
@@ -237,6 +238,12 @@
       if (routeData.features && routeData.features.length > 0) {
         totalDistance = routeData.total_distance;
         dispatch("updateDistance", totalDistance);
+      }
+      console.log("取得した経路データ:", routeData);
+      if (routeData.route_id) {
+        routeId = routeData.route_id;
+        console.log("取得したroute_id:", routeId);
+        dispatch("routeGenerated", { routeId }); // route_idを親に通知
       }
       console.log("APIレスポンス:", routeData);
 
@@ -288,8 +295,9 @@
       }, 300);
     } catch (err) {
       console.error("経路情報の取得に失敗しました", err);
-      errorMessage = "経路の取得に失敗しました。ネットワーク接続を確認してください。";
-      dispatch('error', { message: errorMessage }); // 親に通知
+      errorMessage =
+        "経路の取得に失敗しました。ネットワーク接続を確認してください。";
+      dispatch("error", { message: errorMessage }); // 親に通知
     } finally {
       loading = false;
     }

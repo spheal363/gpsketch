@@ -3,7 +3,7 @@
   import RouteMap from "../RouteMap.svelte";
   export let animal: string;
   export let distance: string;
-  export let handleStart: () => void;
+  export let handleStart: (routeId: string) => void;
   export let goBack: () => void;
   export const ssr = false;
   import { onMount } from "svelte";
@@ -24,12 +24,30 @@
     goto(`/form/error?message=${encodeURIComponent(errorMessage)}`);
   }
   let totalDistance = 0;
+  let routeId = "";
 
   function handleDistanceUpdate(event: CustomEvent<number>) {
     totalDistance = event.detail;
   }
-</script>
 
+  function handleRouteGenerated(event: CustomEvent<{ routeId: string }>) {
+    routeId = event.detail.routeId;
+    console.log("取得したroute_id:", routeId);
+  }
+
+  // navigateページに遷移
+  const startRun = async () => {
+    try {
+      // /api/run/startエンドポイントを呼び出す
+
+      // navigateページに遷移
+      goto(`/navigate?route_id=${routeId}`);
+    } catch (error) {
+      console.error("ランの開始中にエラーが発生しました:", error);
+      alert("ランの開始中にエラーが発生しました。");
+    }
+  };
+</script>
 
 <div class="wrapper">
   <div class="map-container">
@@ -37,6 +55,7 @@
       {animal}
       distance={numericDistance}
       on:updateDistance={handleDistanceUpdate}
+      on:routeGenerated={handleRouteGenerated}
     />
   </div>
   <div class="total-distance">
@@ -47,8 +66,7 @@
     {/if}
   </div>
   <div class="button-container">
-    <button class="route-button" on:click={handleStart}>このルートで走る</button
-    >
+    <button class="route-button" on:click={startRun}>このルートで走る</button>
     <button class="back-button" on:click={goBack}>戻る</button>
   </div>
 </div>
