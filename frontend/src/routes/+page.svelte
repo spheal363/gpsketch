@@ -5,6 +5,7 @@
   import CollectionScreen from "./collection/CollectionScreen.svelte";
   import DetailScreen from "./collection/DetailScreen.svelte";
   import FinishRun from "./form/finishRun.svelte";
+  import ErrorScreen from "./components/ErrorScreen.svelte";
 
   let screen = "home";
   let animal = "";
@@ -59,6 +60,10 @@
   const goHome = () => {
     screen = "home";
   };
+
+  const goForm = () => {
+    screen = "formScreen";
+  };
   
   const goCollection = () => {
     screen = "collectionScreen"
@@ -108,6 +113,10 @@
 
   {#if screen === "finishRun"}
     <FinishRun {goHome} {goCollection} run={selectedRun} />
+  {/if}
+
+  {#if screen === "ErrorScreen"}
+    <ErrorScreen {goHome} />
   {/if}
 </main>
 

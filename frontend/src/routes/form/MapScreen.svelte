@@ -1,16 +1,33 @@
+<!-- src/routes/form/MapScreen.svelte -->
 <script lang="ts">
   import RouteMap from "../RouteMap.svelte";
   export let animal: string;
   export let distance: string;
   export let handleStart: () => void;
   export let goBack: () => void;
+  export const ssr = false;
+  import { onMount } from "svelte";
+  import CurrentLocation from "../CurrentLocationMap.svelte";
+  import LocationProvider from "../LocationProvider.svelte";
+  import { goto } from "$app/navigation";
 
+  let errorMessage = ""; // エラー内容を格納
   const numericDistance = Number(distance);
+
+  // 子コンポーネントからエラーを受け取ったときの処理
+  function handleChildError(event) {
+    const message = event.detail?.message || "不明なエラーが発生しました";
+    errorMessage = message;
+    console.error("MapScreenで受け取ったエラー:", errorMessage);
+
+    // エラーメッセージをクエリパラメータに乗せてErrorScreenへ移動
+    goto(`/form/error?message=${encodeURIComponent(errorMessage)}`);
+  }
 </script>
 
 <div class="wrapper">
   <div class="map-container">
-    <RouteMap {animal} distance={numericDistance} />
+    <RouteMap {animal} distance={numericDistance} on:error={handleChildError} />
   </div>
 
   <div class="button-container">
