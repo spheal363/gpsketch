@@ -32,11 +32,11 @@ CREATE TABLE runs (
 -- track_points テーブル
 CREATE TABLE track_points (
   id CHAR(36) PRIMARY KEY,
-  run_id CHAR(36) NOT NULL,
+  route_id CHAR(36) NOT NULL,
   timestamp TIMESTAMP,
   latitude FLOAT,
   longitude FLOAT,
   distance_from_start FLOAT,
   route_index INT,
-  FOREIGN KEY (run_id) REFERENCES runs(id)
+  FOREIGN KEY (route_id) REFERENCES routes(id)
 );
