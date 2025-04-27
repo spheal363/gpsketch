@@ -16,6 +16,10 @@
     pace_min_per_km: number;
     calories: number;
     animal_name: string;
+    track_geojson: {
+      type: string;
+      coordinates: [number, number][];
+    };
   } | null = null;
   let screenHistory: string[] = [];
 
@@ -34,6 +38,10 @@
     pace_min_per_km: number;
     calories: number;
     animal_name: string;
+    track_geojson: {
+      type: string;
+      coordinates: [number, number][];
+    };
   }) => {
     selectedRun = run; // 選択したランの情報をselectedRunに格納
     goToScreen("detail"); // 詳細画面に遷移

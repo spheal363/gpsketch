@@ -85,30 +85,30 @@ def generate_route():
             return jsonify({"error": "緯度・経度が指定されていません"}), 400
         
         # 座標点データを生成
-        if shape ==  shape not in SHAPES:
+        if shape not in SHAPES:
             points = SHAPES["hiyoko"] #用意されていないイラストの場合はhiyokoとする
         else:
             points = SHAPES[shape]
         
-        # フロントエンドに返す経路一覧を格納するリスト
-            features = []
+    # フロントエンドに返す経路一覧を格納するリスト
+        features = []
 
-            # ルート作成処理を呼び出す
-            route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
+        # ルート作成処理を呼び出す
+        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
 
-            # 結果が期待通りでない場合、エラーログを追加
-            if not route_data:
-                return jsonify({"error": "Failed to generate route"}), 500
+        # 結果が期待通りでない場合、エラーログを追加
+        if not route_data:
+            return jsonify({"error": "Failed to generate route"}), 500
 
-            # 成功した場合はフロントエンドに返す
-            features.append(route_data["route"]["features"][0])
+        # 成功した場合はフロントエンドに返す
+        features.append(route_data["route"]["features"][0])
 
-            return jsonify({
-                "type": "FeatureCollection",
-                "features": features,
-                "waypoints":route_data["waypoints"],
-                "total_distance":route_data["total_distance"]
-            })
+        return jsonify({
+            "type": "FeatureCollection",
+            "features": features,
+            "waypoints":route_data["waypoints"],
+            "total_distance":route_data["total_distance"]
+        })
 
     except Exception as e:
         # 例外発生時のエラーログ
