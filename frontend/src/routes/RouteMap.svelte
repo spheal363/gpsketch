@@ -10,7 +10,7 @@
   const dispatch = createEventDispatcher();
   let totalDistance = 0;
   export const ssr = false;
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import LocationProvider from "./LocationProvider.svelte";
   import Loading from "./components/Loading.svelte";
 
@@ -20,12 +20,14 @@
 
   let map;
   let routeLayer;
-  let imageOverlay; // 画像オーバーレイを格納する変数
+  let imageOverlay;
   let loading = true;
   let errorMessage = "";
-  let locationData = null; // 位置情報を格納する変数を初期化
+  let locationData = null;
   let L;
   let waypointMarkers = [];
+
+  const dispatch = createEventDispatcher(); // 親に通知するためのdispatcher
 
   // 位置情報が更新されたときの処理
   function handleLocationUpdate(event) {
@@ -39,7 +41,7 @@
   // 位置情報の取得に失敗したときの処理
   function handleLocationError(event) {
     errorMessage = event.detail.message;
-    // 位置情報が取得できない場合は東京駅を使用
+    dispatch('error', { message: errorMessage }); // 親に通知
     locationData = {
       latitude: 35.681236,
       longitude: 139.767125,
@@ -53,15 +55,13 @@
 
   // 地図初期化関数
   function initializeMap(lat, lng) {
-    if (map) return; // 既に初期化されている場合は何もしない
-
+    if (map) return;
     map = L.map("map").setView([lat, lng], 15);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap contributors",
     }).addTo(map);
-    // Leafletのデフォルトアイコンの問題を修正する
-    // アイコンのパスを修正
+
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl:
@@ -72,7 +72,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
     });
 
-    // 現在位置にマーカーを追加
     L.marker([lat, lng]).addTo(map).openPopup();
   }
 
@@ -98,7 +97,6 @@
 
   // 動物の画像をオーバーレイする関数
   function addAnimalImageOverlay(waypoints) {
-    // 既存のオーバーレイがあれば削除
     if (imageOverlay && map) {
       map.removeLayer(imageOverlay);
     }
@@ -174,7 +172,6 @@
 
     // デバッグ用：計算された境界を表示
     console.log("画像境界ボックス:", bounds);
-
     return bounds;
   }
 
@@ -198,13 +195,14 @@
     loading = true;
     if (!map || !locationData) {
       errorMessage = "地図が初期化されていないか、位置情報が取得できていません";
+      dispatch('error', { message: errorMessage });
       loading = false;
       return;
     }
 
     try {
-      // animalとdistanceをログに出力
       console.log(`形状: ${animal}、距離: ${distance}km`);
+
       console.log(
         `緯度: ${locationData.latitude}、経度: ${locationData.longitude}`,
       );
@@ -213,23 +211,18 @@
         map.removeLayer(routeLayer);
       }
 
-      // 既存のルートレイヤーとマーカーがあれば削除
-      if (routeLayer) {
-        map.removeLayer(routeLayer);
-      }
+      if (routeLayer) map.removeLayer(routeLayer);
       clearWaypointMarkers();
 
-      // バックエンドに送信するデータ
       const requestData = {
         shape: animal,
-        length: parseFloat(distance) || 10.0, // 数値に変換、変換できない場合はデフォルト値
+        length: parseFloat(distance) || 10.0,
         latitude: locationData.latitude,
         longitude: locationData.longitude,
       };
 
       console.log("APIリクエスト送信:", requestData);
 
-      // バックエンドAPIを呼び出し
       const response = await fetch("http://localhost:5000/api/route/generate", {
         method: "POST",
         headers: {
@@ -254,7 +247,6 @@
         throw new Error("経路データが空です");
       }
 
-      // 経由地点情報が存在する場合、青いマーカーで表示
       if (routeData.waypoints && routeData.waypoints.length > 0) {
         const blueIcon = createBlueIcon();
 
@@ -272,15 +264,13 @@
             direction: "top",
             offset: [0, -10],
           });
-
           waypointMarkers.push(marker);
         });
       }
 
-      console.log("経由地点", routeData.waypoints); //[{lat: 34.7280102, lng: 135.2339336, name: '水島銕也先生'},{lat: 34.7316463, lng: 135.2447187, name: '御影天神山１号線'}..]
+      console.log("経由地点", routeData.waypoints);
       console.log("総距離", routeData.total_distance);
 
-      // 取得した経路を地図に描画
       routeLayer = L.geoJSON(routeData, {
         style: {
           color: "red",
@@ -289,9 +279,7 @@
         },
       }).addTo(map);
 
-      // 順番を変更：先に画像を追加してから、マップの表示範囲を調整
       setTimeout(() => {
-        // 経由地点に基づいて動物の画像を追加
         const imageBounds = addAnimalImageOverlay(routeData.waypoints);
 
         // 画像が追加されたら、その境界に合わせてマップを調整
@@ -303,20 +291,18 @@
       }, 300);
     } catch (err) {
       console.error("経路情報の取得に失敗しました", err);
-      errorMessage =
-        "経路の取得に失敗しました。ネットワーク接続を確認してください。";
+      errorMessage = "経路の取得に失敗しました。ネットワーク接続を確認してください。";
+      dispatch('error', { message: errorMessage }); // 親に通知
     } finally {
       loading = false;
     }
   }
 
   onMount(async () => {
-    // Leafletライブラリをインポート
     const leaflet = await import("leaflet");
     L = leaflet.default;
     await import("leaflet/dist/leaflet.css");
 
-    // もし位置情報がすでにあれば地図を初期化
     if (locationData) {
       initializeMap(locationData.latitude, locationData.longitude);
       generateRoute();
