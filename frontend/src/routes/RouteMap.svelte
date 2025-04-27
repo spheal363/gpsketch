@@ -137,9 +137,9 @@
   function adjustMapView(bounds) {
     if (!map || !bounds) return;
     map.fitBounds(bounds, {
-      padding: [100, 100],
-      maxZoom: 14,
-      animate: true
+      padding: [20, 20], // 少しだけ余白を追加
+      maxZoom: 14,       // 最大ズームレベルを制限
+      animate: true      // アニメーションを有効化
     });
     console.log("マップの表示範囲を調整しました");
   }
