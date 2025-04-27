@@ -3,7 +3,7 @@
 - 位置情報から現在地の緯度、経度を返すコンポーネント
 -->
 
-<script>
+<script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   
   export let autoGet = true; // 自動的に位置情報を取得するかどうか
@@ -47,10 +47,6 @@
   });
 </script>
 
-<!-- 外部から直接操作できるように関数をエクスポート -->
 <svelte:options accessors={true} />
 
-<!-- このコンポーネントはUIを持たないので、slotを使用して子要素を表示（必要な場合） -->
-<slot 
-  getLocation={getLocation}
-/>
+<slot getLocation={getLocation} />
