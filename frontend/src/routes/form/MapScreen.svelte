@@ -23,7 +23,13 @@
     // エラーメッセージをクエリパラメータに乗せてErrorScreenへ移動
     goto(`/form/error?message=${encodeURIComponent(errorMessage)}`);
   }
+  let totalDistance = 0;
+
+  function handleDistanceUpdate(event: CustomEvent<number>) {
+    totalDistance = event.detail;
+  }
 </script>
+
 
 <div class="wrapper">
   <div class="map-container">
@@ -33,18 +39,19 @@
       on:updateDistance={handleDistanceUpdate}
     />
   </div>
-
+  <div class="total-distance">
+    {#if totalDistance > 0}
+      <p>総距離: {totalDistance} km</p>
+    {:else}
+      <p>経路データがまだありません</p>
+    {/if}
+  </div>
   <div class="button-container">
     <button class="route-button" on:click={handleStart}>このルートで走る</button
     >
     <button class="back-button" on:click={goBack}>戻る</button>
   </div>
 </div>
-{#if totalDistance > 0}
-  <p>総距離: {totalDistance} km</p>
-{:else}
-  <p>経路データがまだありません</p>
-{/if}
 
 <style>
   .wrapper {
@@ -52,7 +59,7 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
-    gap: 2rem;
+    gap: 1rem;
     min-height: 100vh;
     box-sizing: border-box;
     background-color: #000d41;
@@ -61,7 +68,7 @@
   .map-container {
     width: 100%;
     max-width: 600px;
-    height: 75vh;
+    height: 70vh;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -108,7 +115,7 @@
 
   @media (max-width: 600px) {
     .map-container {
-      height: 75vh;
+      height: 70vh;
     }
 
     .route-button,
@@ -116,7 +123,9 @@
       font-size: 0.95rem;
     }
   }
-  p {
+  .total-distance p {
     color: white;
+    margin: 0;
+    padding: 0;
   }
 </style>
