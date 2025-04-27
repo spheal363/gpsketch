@@ -1,36 +1,44 @@
 <script lang="ts">
-  import { mockRuns } from "../../lib/mock/mockRuns.js"; // 仮データの読み込み
-
-  // 仮データの型を定義
-  interface Run {
-    start_time: string;
-    end_time: string;
-    actual_distance_km: number;
-    pace_min_per_km: number;
-    calories: number;
-    animal_name: string;
-  }
-
-  let runs: Run[] = mockRuns;
+  import { onMount } from 'svelte';
+  import { runs, isLoading, error, fetchRunCollection } from '../../lib/stores/runStore';
 
   export let goBack: () => void;
   export let detail: (run: Run) => void;
+
+  // コンポーネントがマウントされたらデータを取得
+  onMount(() => {
+    fetchRunCollection();
+  });
 </script>
 
 <header class="page-header">
   <h1>ラン記録一覧（仮）</h1>
 </header>
 
-<div class="card-list">
-  {#each runs as run}
-    <div class="card" on:click={() => detail(run)}>
-      <div class="card-content">
-        <div><strong>描いた動物名:</strong> {run.animal_name}</div>
-        <div><strong>距離:</strong> {run.actual_distance_km} km</div>
+{#if $isLoading}
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>ラン記録を読み込み中...</p>
+  </div>
+{:else if $error}
+  <div class="error">{$error}</div>
+  <div class="center-wrapper">
+    <button class="retry-button" on:click={fetchRunCollection}>再試行</button>
+  </div>
+{:else if $runs.length === 0}
+  <div class="empty-state">記録がありません</div>
+{:else}
+  <div class="card-list">
+    {#each $runs as run}
+      <div class="card" on:click={() => detail(run)}>
+        <div class="card-content">
+          <div><strong>描いた動物名:</strong> {run.animal_name}</div>
+          <div><strong>距離:</strong> {run.actual_distance_km} km</div>
+        </div>
       </div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+{/if}
 
 <div class="center-wrapper">
   <button class="back-button" on:click={goBack}>戻る</button>

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import RunMapDisplay from './RunMapDisplay.svelte';
+
     export let goBack: () => void;
     export let run: {
         start_time: string;
@@ -7,6 +9,10 @@
         pace_min_per_km: number;
         calories: number;
         animal_name: string;
+        track_geojson: {
+            type: string;
+            coordinates: [number, number][];
+        };
     } | null = null;
 </script>
 
@@ -21,12 +27,15 @@
       <div class="detail-item"><strong>ペース:</strong> {run.pace_min_per_km} 分/km</div>
       <div class="detail-item"><strong>消費カロリー:</strong> {run.calories} kcal</div>
     </div>
+    <div class="map-container">
+      <RunMapDisplay track_geojson={run.track_geojson} />
+    </div>
   {:else}
     <div class="no-data">
       <p>詳細情報がありません。</p>
     </div>
   {/if}
-
+    
   <button class="back-button" on:click={goBack}>戻る</button>
 </div>
 
@@ -45,12 +54,21 @@
         width: 300px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         color: #000d41;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     .detail-card h3 {
         font-size: 1.5rem;
         text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .map-container {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         margin-bottom: 1rem;
     }
 
