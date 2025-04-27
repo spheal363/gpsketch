@@ -38,7 +38,7 @@ class TrackPoint(db.Model):
     __tablename__ = 'track_points'
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    run_id = db.Column(db.String(36), db.ForeignKey('runs.id'), nullable=False)
+    route_id = db.Column(db.String(36), db.ForeignKey('runs.id'), nullable=False)
     timestamp = db.Column(db.DateTime)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)

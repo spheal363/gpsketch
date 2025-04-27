@@ -20,11 +20,11 @@
   let imageOverlay;
   let loading = true;
   let errorMessage = "";
-  let locationData = null;
+  let locationData = null; // 位置情報を格納する変数を初期化
   let L;
   let waypointMarkers = [];
 
-  const dispatch = createEventDispatcher(); // 親に通知するためのdispatcher
+  const dispatch = createEventDispatcher();
 
   // 位置情報が更新されたときの処理
   function handleLocationUpdate(event) {
@@ -52,7 +52,8 @@
 
   // 地図初期化関数
   function initializeMap(lat, lng) {
-    if (map) return;
+    if (map) return; // 既に初期化されている場合は何もしない
+
     map = L.map("map").setView([lat, lng], 15);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -239,6 +240,10 @@
         dispatch("updateDistance", totalDistance);
       }
       console.log("APIレスポンス:", routeData);
+
+      if (routeData.routes_id) {
+        dispatch("routeGenerated", { routeId: routeData.routes_id }); // route_idを親に通知
+      }
 
       if (!routeData.features || routeData.features.length === 0) {
         throw new Error("経路データが空です");
