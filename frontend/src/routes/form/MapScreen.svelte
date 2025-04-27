@@ -3,6 +3,8 @@
   import RouteMap from "../RouteMap.svelte";
   import { goto } from "$app/navigation"; // SvelteKitのページ遷移用関数
 
+  import { goto } from "$app/navigation"; // SvelteKitのページ遷移用関数
+
   export let animal: string;
   export let distance: string;
   export let handleStart: (routeId: string) => void;
@@ -128,7 +130,6 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
 
   .button-container {
@@ -153,7 +154,6 @@
   }
 
   .route-button {
-    background-color: #fea900;
     background-color: #fea900;
     color: white;
   }

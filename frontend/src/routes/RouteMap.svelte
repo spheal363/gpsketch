@@ -170,6 +170,7 @@
 
     // デバッグ用：計算された境界を表示
     console.log("画像境界ボックス:", bounds);
+
     return bounds;
   }
 

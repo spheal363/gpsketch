@@ -8,16 +8,24 @@ import uuid
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
 
+import json
+import uuid
+from datetime import datetime
+from math import radians, cos, sin, asin, sqrt
+
 from services.route_service import generate_running_route
 from config import Config
 from models import db, Route, TrackPoint, Run
+from models import db, Route, TrackPoint, Run
 
+# アプリ設定
 # アプリ設定
 app = Flask(__name__)
 CORS(app)
 app.config.from_object(Config)
 db.init_app(app)
 
+# 環境変数読み込み
 # 環境変数読み込み
 load_dotenv()
 ORS_API_KEY = os.getenv("ORS_API_KEY")
@@ -36,39 +44,17 @@ SHAPES = {
 def generate_route():
     try:
         data = request.json
-        
-        # データのバリデーション
-        if not data:
-            return jsonify({"error": "データが送信されていません"}), 400
-        
-        # 必要なパラメータを取得
-        shape = data.get("shape", "hiyoko")  # イラストname
-        target_distance = data.get("length", 10.0)      # 距離（km）
-        current_lat = data.get("latitude", 35.681236)       # 緯度
-        current_lon = data.get("longitude", 139.767125)     # 経度
-        
-        # 緯度経度のバリデーション
-        if current_lat is None or current_lon is None:
-            return jsonify({"error": "緯度・経度が指定されていません"}), 400
-        
-        # 座標点データを生成
-        if shape not in SHAPES:
-            points = SHAPES["hiyoko"] #用意されていないイラストの場合はhiyokoとする
-        else:
-            points = SHAPES[shape]
-        
-        # フロントエンドに返す経路一覧を格納するリスト
-        features = []
+        shape = data.get("shape", "hiyoko")
+        target_distance = data.get("length", 10.0)
+        current_lat = data.get("latitude", 35.681236)
+        current_lon = data.get("longitude", 139.767125)
 
-        # ルート作成処理を呼び出す
-        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
-        # ルート作成処理を呼び出す
-        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
+        if not data or current_lat is None or current_lon is None:
+            return jsonify({"error": "Invalid input"}), 400
 
-        # 結果が期待通りでない場合、エラーログを追加
-        if not route_data:
-            return jsonify({"error": "Failed to generate route"}), 500
-        # 結果が期待通りでない場合、エラーログを追加
+        points = SHAPES.get(shape, SHAPES["hiyoko"])
+
+        route_data = generate_running_route(current_lat, current_lon, points, target_distance, ORS_API_KEY)
         if not route_data:
             return jsonify({"error": "Failed to generate route"}), 500
 
