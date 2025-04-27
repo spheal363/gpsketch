@@ -5,9 +5,6 @@
 -->
 
 <script>
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
   let totalDistance = 0;
   export const ssr = false;
   import { onMount, createEventDispatcher } from "svelte";
